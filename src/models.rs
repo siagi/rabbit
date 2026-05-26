@@ -128,4 +128,8 @@ mod tests {
         };
         assert_eq!(developer.stack_label(), "Rust / Ratatui / AI tools");
     }
+    #[test]
+    fn lurkin_status_is_open_to_work() {
+        assert!(Status::Lurking.is_open_to_work())
+    }
 }

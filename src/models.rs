@@ -80,6 +80,105 @@ impl Developer {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PostKind {
+    Signal,
+    BuildLog,
+    Question,
+    Summary,
+    Resource,
+}
+impl PostKind {
+    pub fn label(&self) -> &'static str {
+        match self {
+            PostKind::Signal => "signal",
+            PostKind::BuildLog => "build log",
+            PostKind::Question => "question",
+            PostKind::Summary => "summary",
+            PostKind::Resource => "resource",
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Visibility {
+    Private,
+    Room,
+    Burrow,
+    Public,
+}
+impl Visibility {
+    pub fn label(&self) -> &'static str {
+        match self {
+            Visibility::Private => "private",
+            Visibility::Room => "room",
+            Visibility::Burrow => "burrow",
+            Visibility::Public => "public",
+        }
+    }
+}
+//TOASK: Why here is PartialEq and Eq also why Debug and Clone  ?
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PostStatus {
+    Draft,
+    Published,
+    Archived,
+}
+impl PostStatus {
+    pub fn label(&self) -> &'static str {
+        match self {
+            PostStatus::Draft => "draft",
+            PostStatus::Published => "published",
+            PostStatus::Archived => "archived",
+        }
+    }
+    pub fn is_visible(&self) -> bool {
+        match self {
+            PostStatus::Published => true,
+            PostStatus::Draft | PostStatus::Archived => false,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Post {
+    pub id: String,
+    pub author_handle: String,
+    pub room_slug: String,
+    pub kind: PostKind,
+    pub title: Option<String>,
+    pub body_markdown: String,
+    pub tags: Vec<String>,
+    pub visibility: Visibility,
+    pub status: PostStatus,
+}
+//TOASK: why here we have self with "&" and above without in match ?
+impl Post {
+    pub fn display_title(&self) -> String {
+        match &self.title {
+            Some(title) => title.clone(),
+            None => String::from("(untitled)"),
+        }
+    }
+    pub fn tags_label(&self) -> String {
+        if self.tags.is_empty() {
+            String::from("no tags")
+        } else {
+            self.tags.join(", ")
+        }
+    }
+
+    pub fn summary_line(&self) -> String {
+        format!(
+            "{} · {} · {} · {}",
+            self.author_handle,
+            self.kind.label(),
+            self.room_slug,
+            self.tags_label()
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -131,5 +230,47 @@ mod tests {
     #[test]
     fn lurkin_status_is_open_to_work() {
         assert!(Status::Lurking.is_open_to_work())
+    }
+    #[test]
+    fn draft_post_is_not_visible() {
+        assert!(!PostStatus::Draft.is_visible())
+    }
+    #[test]
+    fn published_post_is_visible() {
+        assert!(PostStatus::Published.is_visible())
+    }
+    #[test]
+    fn post_without_title_has_fallback_title() {
+        let post = Post {
+            id: String::from("post_1"),
+            author_handle: String::from("@michal"),
+            room_slug: String::from("ratatui-builders"),
+            kind: PostKind::Signal,
+            title: None,
+            body_markdown: String::from("AI-assisted. Human-owned."),
+            tags: vec![String::from("ai"), String::from("craft")],
+            visibility: Visibility::Room,
+            status: PostStatus::Published,
+        };
+        assert_eq!(post.display_title(), "(untitled)")
+    }
+    #[test]
+    fn post_tags_are_joined() {
+        let post = Post {
+            id: String::from("post_1"),
+            author_handle: String::from("@michal"),
+            room_slug: String::from("ratatui-builders"),
+            kind: PostKind::Summary,
+            title: Some(String::from("Rabbit Core 01")),
+            body_markdown: String::from("# Rabbit Core 01"),
+            tags: vec![
+                String::from("rust"),
+                String::from("rabbit"),
+                String::from("learning"),
+            ],
+            visibility: Visibility::Room,
+            status: PostStatus::Published,
+        };
+        assert_eq!(post.tags_label(), "rust, rabbit, learning");
     }
 }

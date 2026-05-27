@@ -1,5 +1,5 @@
 mod models;
-use models::{CraftMode, Developer, Status};
+use models::{CraftMode, Developer, Post, PostKind, PostStatus, Status, Visibility};
 fn main() {
     println!("::Start App::Welcome In The Rabbit Hole::");
     let developers = vec![
@@ -51,6 +51,53 @@ fn main() {
             craft_mode: CraftMode::LearningMode,
         },
     ];
+
+    let posts = vec![
+        Post {
+            id: String::from("post_1"),
+            author_handle: String::from("@michal"),
+            room_slug: String::from("ratatui-builders"),
+            kind: PostKind::Summary,
+            title: Some(String::from("Rabbit Core 01 — Models and first tests")),
+            body_markdown: String::from(
+                "# Rabbit Core 01\n\n## What we built\n\n- Developer model\n- Status enum\n- CraftMode enum\n\n## Key idea\n\nAI-assisted. Human-owned.",
+            ),
+            tags: vec![
+                String::from("rust"),
+                String::from("rabbit"),
+                String::from("learning"),
+            ],
+            visibility: Visibility::Room,
+            status: PostStatus::Published,
+        },
+        Post {
+            id: String::from("post_2"),
+            author_handle: String::from("@anna_rust"),
+            room_slug: String::from("rust-pl"),
+            kind: PostKind::Signal,
+            title: None,
+            body_markdown: String::from(
+                "Finally understood why `String` owns text and `&str` borrows it.",
+            ),
+            tags: vec![String::from("rust"), String::from("ownership")],
+            visibility: Visibility::Room,
+            status: PostStatus::Published,
+        },
+        Post {
+            id: String::from("post_3"),
+            author_handle: String::from("@neo"),
+            room_slug: String::from("main"),
+            kind: PostKind::Question,
+            title: Some(String::from("Can terminal apps feel social?")),
+            body_markdown: String::from(
+                "What would make a terminal-native dev network feel alive without becoming noisy?",
+            ),
+            tags: vec![String::from("product"), String::from("terminal")],
+            visibility: Visibility::Burrow,
+            status: PostStatus::Draft,
+        },
+    ];
+
     println!("They said developers are dead.");
     println!("We kept coding.");
     println!();
@@ -65,6 +112,17 @@ fn main() {
     for developer in &developers {
         if developer.status.is_open_to_work() {
             println!("{}", developer.display_line())
+        }
+    }
+
+    println!();
+    println!("Latest posts:");
+    for post in &posts {
+        if post.status.is_visible() {
+            println!();
+            println!("{}", post.display_title());
+            println!("{}", post.summary_line());
+            println!("{}", post.body_markdown);
         }
     }
 }

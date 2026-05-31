@@ -1,30 +1,32 @@
 mod models;
 mod services;
-use models::{CraftMode, Developer, Post, PostKind, PostStatus, Status, Visibility, Room};
-use services::{open_to_work, published_posts,published_posts_in_room, search_developers, search_posts}
+use models::{CraftMode, Developer, Post, PostKind, PostStatus, Room, Status, Visibility};
+use services::{
+    open_to_work, published_posts, published_posts_in_room, search_developers, search_posts,
+};
 fn main() {
     println!("::Start App::Welcome In The Rabbit Hole::");
     let rooms = vec![
-        Room{
+        Room {
             slug: String::from("main"),
-                name: String::from("Main Burrow"),
-                description: String::from("General DDS room"),
+            name: String::from("Main Burrow"),
+            description: String::from("General DDS room"),
         },
         Room {
             slug: String::from("rust-pl"),
             name: String::from("Rust PL"),
             description: String::from("Polish Rust room"),
         },
-       Room {
-           slug: String::from("ratatui-builders"),
-           name: String::from("Ratatui Builders"),
-           description: String::from("Terminal UI builders"),
-       },
-       Room {
-           slug: String::from("backend-cave"),
-           name: String::from("Backend Cave"),
-           description: String::from("Backend, infra and databases"),
-       },
+        Room {
+            slug: String::from("ratatui-builders"),
+            name: String::from("Ratatui Builders"),
+            description: String::from("Terminal UI builders"),
+        },
+        Room {
+            slug: String::from("backend-cave"),
+            name: String::from("Backend Cave"),
+            description: String::from("Backend, infra and databases"),
+        },
     ];
     let developers = vec![
         Developer {
@@ -128,7 +130,6 @@ fn main() {
         println!("{} - {}", room.slug, room.name)
     }
 
-
     println!("They said developers are dead.");
     println!("We kept coding.");
     println!();
@@ -161,17 +162,17 @@ fn main() {
         }
     }
 
-    for developer in search_developers(&developers, "rust"){
+    for developer in search_developers(&developers, "rust") {
         println!("{}", developer.display_line())
     }
 
-    for post in published_posts_in_room(&posts, "rust-pl"){
+    for post in published_posts_in_room(&posts, "rust-pl") {
         println!();
         println!("{}", post.display_title());
         println!("{}", post.summary_line());
     }
 
-    for post in search_posts(&posts, "ownership"){
+    for post in search_posts(&posts, "ownership") {
         println!("{}", post.summary_line());
     }
 }

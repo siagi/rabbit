@@ -179,6 +179,13 @@ impl Post {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct Room {
+    pub slug: String,
+    pub name: String,
+    pub description: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

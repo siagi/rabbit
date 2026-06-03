@@ -1,4 +1,4 @@
-use crate::models::{Developer, Post, Room};
+use crate::models::{Developer, Ping, PingStatus, Post, Room};
 
 pub fn search_developers<'a>(developerts: &'a [Developer], query: &str) -> Vec<&'a Developer> {
     let query = query.to_lowercase();
@@ -64,6 +64,23 @@ pub fn search_posts<'a>(posts: &'a [Post], query: &str) -> Vec<&'a Post> {
                 || post.room_slug.to_lowercase().contains(&query)
         })
         .collect()
+}
+
+pub fn create_ping(
+    id: &str,
+    from_handle: &str,
+    to_handle: &str,
+    message: &str,
+    created_at: &str,
+) -> Ping {
+    Ping {
+        id: id.to_string(),
+        from_handle: from_handle.to_string(),
+        to_handle: to_handle.to_string(),
+        message: message.to_string(),
+        status: PingStatus::Pending,
+        created_at: created_at.to_string(),
+    }
 }
 
 #[cfg(test)]

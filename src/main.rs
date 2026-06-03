@@ -1,6 +1,8 @@
 mod models;
 mod services;
-use models::{CraftMode, Developer, Post, PostKind, PostStatus, Room, Status, Visibility};
+use models::{
+    CraftMode, Developer, Ping, PingStatus, Post, PostKind, PostStatus, Room, Status, Visibility,
+};
 use services::{
     open_to_work, published_posts, published_posts_in_room, search_developers, search_posts,
 };

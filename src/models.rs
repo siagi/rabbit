@@ -179,6 +179,51 @@ impl Post {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PingStatus {
+    Pending,
+    Accepted,
+    Declined,
+    Delivered,
+}
+
+impl PingStatus {
+    pub fn label(&self) -> &'static str {
+        match self {
+            PingStatus::Pending => "pending",
+            PingStatus::Accepted => "accepted",
+            PingStatus::Declined => "declined",
+            PingStatus::Delivered => "delivered",
+        }
+    }
+    pub fn is_open(&self) -> bool {
+        match self {
+            PingStatus::Pending | PingStatus::Delivered => true,
+            PingStatus::Accepted | PingStatus::Declined => false,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Ping {
+    pub id: String,
+    pub from_handle: String,
+    pub to_handle: String,
+    pub message: String,
+    pub status: PingStatus,
+    pub created_at: String,
+}
+
+impl Ping {
+    pub fn summary_line(&self) -> String {
+        format! {"{} · {} → {} · {}", self.id, self.from_handle, self.to_handle, self.status.label()}
+    }
+
+    pub fn display(&self) -> String {
+        format! {"{}\n{}\n\n{}",self.summary_line(), self.created_at, self.message }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Room {
     pub slug: String,
@@ -279,5 +324,40 @@ mod tests {
             status: PostStatus::Published,
         };
         assert_eq!(post.tags_label(), "rust, rabbit, learning");
+    }
+
+    #[test]
+    fn pending_ping_is_open() {
+        assert!(PingStatus::Pending.is_open());
+    }
+
+    #[test]
+    fn delivered_ping_is_open() {
+        assert!(PingStatus::Delivered.is_open());
+    }
+
+    #[test]
+    fn accepted_ping_is_not_open() {
+        assert!(!PingStatus::Accepted.is_open());
+    }
+
+    #[test]
+    fn declined_ping_is_not_open() {
+        assert!(!PingStatus::Declined.is_open());
+    }
+
+    #[test]
+    fn ping_summary_line_contains_sender_and_receiver() {
+        let ping = Ping {
+            id: String::from("ping_1"),
+            from_handle: String::from("@michal"),
+            to_handle: String::from("@anna_rust"),
+            message: String::from("Hej, quest?"),
+            status: PingStatus::Pending,
+            created_at: String::from("2026-05-31T12:00:00Z"),
+        };
+
+        assert!(ping.summary_line().contains("@michal"));
+        assert!(ping.summary_line().contains("@anna_rust"));
     }
 }
